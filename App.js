@@ -158,7 +158,7 @@ export default createContainer(params => {
   const appUsers = users;
   return {
     appUsers: appUsers,
-    currentUserId: '',
-    appId: '9jzsnnDgTj5mX8xtH',
+    currentUserId: params.currentUserId,
+    appId: params.appId,
   };
 }, App);
