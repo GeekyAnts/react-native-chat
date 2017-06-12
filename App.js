@@ -25,7 +25,7 @@ import {
 import UserList from "./src/components/UserList";
 import ChatWindow from "./src/components/ChatWindow";
 
-Meteor.connect("ws://api.react-native-chat.com:3000:3000/websocket");
+Meteor.connect("ws://api.react-native-chat.com/websocket");
 // BHavish: Id: 3uGoJmtDB3H9rGfMw
 const data = {
   email: "test@test.com",
