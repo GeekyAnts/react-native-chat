@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
 export default createContainer(params => {
   let users = Meteor.collection("appUsers").find({ appId: params.appId, status: true });
   _.remove(users, {
-    _id: params.currentUserId
+    uniqueKey: params.currentUserId
   });
   const appUsers = users;
   return {

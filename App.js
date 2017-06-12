@@ -49,23 +49,14 @@ class App extends Component {
       isChatWindow: false,
       displayName: "",
       selectedUserId: "",
-      currentUserId: this.props.currentUserId
+      currentUserId: this.props.uniqueKey
     };
   }
 
   componentDidMount() {
-    if (!this.props.currentUserId) {
-      let authParams = {
-        appId: this.props.appId,
-        displayName: _.get(this.props, 'displayName', 'Default USer'),
-        status: true,
-      };
-      Meteor.call('appUser.save', [authParams], (err, resp) => {
-        if (resp.appExists) {
-          this.setState({ currentUserId: resp.userId });
-        }
-      });
-    }
+    // if (this.props.uniqueKey === '') {
+    //   alert('Error please check handleData func');
+    // }
   }
 
   renderRow = ({ item }) => {
@@ -114,9 +105,8 @@ class App extends Component {
   };
 
   render() {
-    const { appUsers, appChatRooms, currentUserId, appId } = this.props;
     return (
-      <Container>
+      <Container style={{ alignSelf: 'stretch' }}>
         <Header>
           <Left>
             {this.state.isChatWindow
@@ -149,16 +139,48 @@ const styles = StyleSheet.create({
 });
 
 export default createContainer(params => {
+  let userKey = '';
+  if (params.isNewUser) {
+    if (params.displayName) {
+      let authParams = {
+        appId: params.appId,
+        uniqueKey: params.uniqueKey,
+        displayName: params.displayName,
+        status: true,
+      };
+      Meteor.call('appUser.save', [authParams], (err, resp) => {
+        if (resp) {
+          if (resp.appExists) {
+            params.handleData({ status: 'success' });
+            userKey = params.uniqueKey;
+          } else {
+            params.handleData({ reason: 'appexists is false', status: 'error', error: 'AppId Dosen\'t exist' });
+            userKey = '';
+          }
+        }
+      });
+    } else {
+      params.handleData({ reason: 'appexists is false', status: 'error', error: 'Please Provide displayName' });
+      userKey = '';
+    }
+  } else {
+    const isUser = Meteor.collection("appUsers").find({ uniqueKey: params.uniqueKey });
+    params.handleData({ status: 'success', data: isUser });
+    userKey = params.uniqueKey;
+  }
+
   Meteor.subscribe("appUsers", {}, function (resp) {
   });
-  let users = Meteor.collection("appUsers").find({ appId: '9jzsnnDgTj5mX8xtH' });
-  _.remove(users, {
-    _id: "iJxbv4aZidTJEjLQS"
-  });
+  let users = Meteor.collection("appUsers").find({ appId: params.appId });
+  if (params.uniqueKey) {
+    _.remove(users, {
+      uniqueKey: params.uniqueKey
+    });
+  }
   const appUsers = users;
   return {
     appUsers: appUsers,
-    currentUserId: params.currentUserId,
+    uniqueKey: userKey,
     appId: params.appId,
   };
 }, App);

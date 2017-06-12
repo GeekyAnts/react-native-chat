@@ -99,9 +99,9 @@ export default createContainer(params => {
     if (findRoomId.length === 0) {
       // create new room
       const chatRoom = {
-        appId: 'vRg3HsbHjXRHfs639',
+        appId: props.appId,
         roomName: params.roomName,
-        createByAppUserId: '9jzsnnDgTj5mX8xtH',
+        createByAppUserId: props.currentUserId,
       };
       Meteor.call('chatroom.save', chatRoom);
       chatRoomId = params.roomName;
