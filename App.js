@@ -32,7 +32,7 @@ const data = {
   userType: "admin"
 };
 
-class App extends Component {
+class GeekChat extends Component {
   static propTypes() {
     return {
       appUsers: PropTypes.arrayOf(PropsTypes.object),
@@ -183,4 +183,4 @@ export default createContainer(params => {
     uniqueKey: userKey,
     appId: params.appId,
   };
-}, App);
+}, GeekChat);
