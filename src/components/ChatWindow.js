@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import {
   StyleSheet,
   Text,
@@ -16,6 +16,7 @@ import {
   Item,
   Input,
   Label,
+  Spinner,
   Button,
   Header,
   Left,
@@ -30,46 +31,52 @@ import { compose } from "react-komposer";
 
 const Screenheight = Dimensions.get("window").height - 64;
 
-ChatWindow = props => {
-  const transformedMessages = [];
-  messageTransformer = () => {
-    _.map(props.appChatRoomMessages, obj => {
-      const messageObj = {};
-      messageObj._id = obj._id; // currentID
-      messageObj.text = obj.content;
-      messageObj.createdAt = obj.createdAt;
-      messageObj.user = {
-        _id: obj.createdByAppUserId
-      };
-      transformedMessages.unshift(messageObj);
-    });
-  };
+const transformedMessages = [];
 
-  messageTransformer();
+export default class ChatWindow extends Component {
+  constructor(props) {
+    super(props);
+    messageTransformer = () => {
+      _.map(this.props.appChatRoomMessages, obj => {
+        const messageObj = {};
+        messageObj._id = obj._id; // currentID
+        messageObj.text = obj.content;
+        messageObj.createdAt = obj.createdAt;
+        messageObj.user = {
+          _id: obj.createdByAppUserId
+        };
+        transformedMessages.unshift(messageObj);
+      });
+    };
+    messageTransformer();
+  }
 
   onSend = (messages = []) => {
     const messageObj = {
-      appId: props.appId,
-      chatRoomId: props.chatRoomId,
-      createdByAppUserId: props.currentUserId, // Bhavish
+      appId: this.props.appId,
+      chatRoomId: this.props.chatRoomId,
+      createdByAppUserId: this.props.currentUserId, // Bhavish
       type: "Text",
       content: messages[0].text
     };
-    // Meteor.call("chatRoomMessage.save", messageObj);
+    this.props.feathersApp.service("app-chat-room-messages").create(messageObj);
   };
-  return (
-    <View style={styles.container}>
-      <GiftedChat
-        messages={transformedMessages}
-        keyboardShouldPersistTaps="always"
-        onSend={this.onSend}
-        user={{
-          _id: props.currentUserId
-        }}
-      />
-    </View>
-  );
-};
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <GiftedChat
+          messages={transformedMessages}
+          keyboardShouldPersistTaps="always"
+          onSend={this.onSend}
+          user={{
+            _id: this.props.currentUserId
+          }}
+        />
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -87,28 +94,65 @@ const styles = StyleSheet.create({
   }
 });
 
-fetchMessages = (props, onData) => {
-  console.log(props);
-  const chatProps = {
-    appUsers: [],
-    uniqueKey: "bhavish",
-    appId: "594261f8b91d61efdf26d1db"
-  };
-  props.feathersApp
-    .authenticate(authData)
-    .then(result => {
-      props.feathersApp
-        .service("app-users")
-        .find()
-        .then(data => {
-          chatProps.appUsers = data.data;
-          onData(null, chatProps);
-        })
-        .catch(err => console.log("Create", err));
-    })
-    .catch(function(error) {
-      console.error("Error authenticating!", error);
-    });
+const composerOptions = {
+  pure: true,
+  loadingHandler: () => (
+    <Container>
+      <Content
+        contentContainerStyle={{
+          alignSelf: "stretch",
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+      >
+        <Spinner />
+      </Content>
+    </Container>
+  )
 };
 
-export default compose(fetchMessages)(ChatWindow);
+fetchMessages = async (props, onData) => {
+  let chatRoomId = props.roomName;
+  const query = {
+    query: {
+      roomName: props.roomName
+    }
+  };
+
+  let findRoomId = await props.feathersApp
+    .service("app-chat-rooms")
+    .find(query);
+
+  if (findRoomId.total === 0) {
+    const reverseQuery = {
+      query: {
+        roomName: props.reverseName
+      }
+    };
+
+    chatRoomId = props.reverseName;
+    findRoomId = await props.feathersApp
+      .service("app-chat-rooms")
+      .find(reverseQuery);
+    if (findRoomId.total === 0) {
+      // create new room
+      const chatRoom = {
+        appId: props.appId,
+        roomName: props.roomName,
+        createByAppUserId: props.currentUserId
+      };
+      const createdRoom = await props.feathersApp
+        .service("app-chat-rooms")
+        .create(chatRoom);
+      chatRoomId = props.roomName;
+    }
+  }
+
+  const chatWindowProps = {
+    appChatRoomMessages: [],
+    chatRoomId: chatRoomId
+  };
+  onData(null, chatWindowProps);
+};
+
+compose(fetchMessages, composerOptions)(ChatWindow);

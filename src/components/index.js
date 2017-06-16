@@ -75,20 +75,6 @@ class GeekChat extends Component {
     };
   }
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      isChatWindow: false,
-      displayName: "",
-      selectedUserId: "",
-      currentUserId: this.props.uniqueKey
-    };
-  }
-
-  componentDidMount() {
-    // console.log("Props", this.props);
-  }
-
   renderRow = ({ item }) => {
     return (
       <View>
@@ -98,7 +84,7 @@ class GeekChat extends Component {
   };
 
   navigate = (bool, name, selectedUserId) => {
-    this.setState({
+    this.props.setState({
       isChatWindow: bool,
       displayName: name,
       selectedUserId: selectedUserId
@@ -106,16 +92,16 @@ class GeekChat extends Component {
   };
 
   renderWindow = () => {
-    if (this.state.isChatWindow) {
-      const uniqueRoomName = `${this.state.currentUserId}_${this.state.selectedUserId}`;
-      const reverseUniqueName = `${this.state.selectedUserId}_${this.state.currentUserId}`;
+    if (this.props.state.isChatWindow) {
+      const uniqueRoomName = `${this.props.state.currentUserId}_${this.props.state.selectedUserId}`;
+      const reverseUniqueName = `${this.props.state.selectedUserId}_${this.props.state.currentUserId}`;
       return (
         <ChatWindow
           feathersApp={feathersApp}
           appId={this.props.appId}
           reverseName={reverseUniqueName}
           roomName={uniqueRoomName}
-          currentUserId={this.state.currentUserId}
+          currentUserId={this.props.state.currentUserId}
         />
       );
     }
@@ -128,7 +114,7 @@ class GeekChat extends Component {
               appUsersOffline={[
                 { id: "1", status: false, displayName: "Offline User" }
               ]}
-              currentUserId={this.state.currentUserId}
+              currentUserId={this.props.state.currentUserId}
               onPress={(bool, name, selectedUserId) =>
                 this.navigate(bool, name, selectedUserId)}
             />
@@ -146,9 +132,9 @@ class GeekChat extends Component {
       <Container>
         <Header>
           <Left>
-            {this.state.isChatWindow
+            {this.props.state.isChatWindow
               ? <Button
-                  onPress={() => this.setState({ isChatWindow: false })}
+                  onPress={() => this.props.setState({ isChatWindow: false })}
                   transparent
                 >
                   <Icon name="arrow-back" />
@@ -157,7 +143,9 @@ class GeekChat extends Component {
           </Left>
           <Body>
             <Title>
-              {this.state.isChatWindow ? this.state.displayName : "Users"}
+              {this.props.state.isChatWindow
+                ? this.props.state.displayName
+                : "Users"}
             </Title>
           </Body>
           <Right />
@@ -180,7 +168,6 @@ const composerOptions = {
     <Container>
       <Content
         contentContainerStyle={{
-          borderWidth: 2,
           alignSelf: "stretch",
           justifyContent: "center",
           alignItems: "center"
@@ -193,34 +180,49 @@ const composerOptions = {
 };
 
 fetchList = (props, onData) => {
+  let state = {
+    isChatWindow: false,
+    displayName: "",
+    selectedUserId: "",
+    currentUserId: "bhavish1"
+  };
+
+  let setState = data => {
+    state = _.extend(state, data);
+    onData(null, chatProps);
+  };
+
   const chatProps = {
     appUsers: [],
-    uniqueKey: "bhavish",
-    appId: "594261f8b91d61efdf26d1db"
+    uniqueKey: "bhavish1",
+    appId: "594261f8b91d61efdf26d1db",
+    state: state,
+    setState: setState
   };
-  // feathersApp
-  //   .authenticate(authData)
-  //   .then(result => {
-  //     feathersApp
-  //       .service("app-users")
-  //       .find()
-  //       .then(data => {
-  //         chatProps.appUsers = data.data;
-  //         onData(null, chatProps);
-  //       })
-  //       .catch(err => console.log("Create", err));
-  //   })
-  //   .catch(function(error) {
-  //     console.error("Error authenticating!", error);
-  //   });
-  setInterval(function() {
-    chatProps.appUsers = [
-      { _id: "1", status: true, displayName: "online User" },
-      { _id: "2", status: true, displayName: "default User" },
-      { _id: "3", status: false, displayName: "Offline User" }
-    ];
-    onData(null, chatProps);
-  }, 5000);
+
+  feathersApp
+    .authenticate(authData)
+    .then(result => {
+      feathersApp
+        .service("app-users")
+        .find()
+        .then(data => {
+          chatProps.appUsers = data.data;
+          onData(null, chatProps);
+        })
+        .catch(err => console.log("Create", err));
+    })
+    .catch(function(error) {
+      console.error("Error authenticating!", error);
+    });
+  // setInterval(function() {
+  //   chatProps.appUsers = [
+  //     { _id: "1", status: true, displayName: "online User" },
+  //     { _id: "2", status: true, displayName: "default User" },
+  //     { _id: "3", status: false, displayName: "Offline User" }
+  //   ];
+  //   onData(null, chatProps);
+  // }, 5000);
 };
 
 export default compose(fetchList, composerOptions)(GeekChat);
