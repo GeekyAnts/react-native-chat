@@ -1,0 +1,14 @@
+
+  let data = {
+    a: "Hello",
+    b: "Bye"
+  };
+
+  setInterval(function() {
+    data = {
+      a: "Yo",
+      b: "Lo"
+    };
+    console.log("Hi");
+    onData(null, data);
+  }, 3000);
