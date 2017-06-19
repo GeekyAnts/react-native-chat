@@ -77,9 +77,7 @@ export default class GeekChat extends Component {
           ? <UserList
               appId={this.props.appId}
               appUsers={this.props.appUsers}
-              appUsersOffline={[
-                { id: "1", status: false, displayName: "Offline User" }
-              ]}
+              appUsersOffline={this.props.appUsersOffline}
               currentUserId={this.props.state.currentUserId}
               onPress={(bool, name, selectedUserId) =>
                 this.navigate(bool, name, selectedUserId)}

@@ -10,7 +10,7 @@ import socketio from "feathers-socketio/client";
 import authentication from "feathers-authentication-client";
 import { compose } from "react-komposer";
 
-const API_URL = "http://localhost:3030?token=testing";
+const API_URL = "http://10.0.1.38:3030?token=testing";
 
 const data = {
   appId: "594261f8b91d61efdf26d1db",
@@ -33,6 +33,7 @@ const options = {
 };
 
 const socket = io(API_URL, options);
+console.log(socket);
 const feathersApp = feathers()
   .configure(socketio(socket))
   .configure(hooks())
@@ -61,6 +62,9 @@ const composerOptions = {
 fetchList = async (props, onData) => {
   const authenticate = await feathersApp.authenticate(authData);
   if (authenticate) {
+    feathersApp.on("login", data => {
+      console.log(data);
+    });
     let state = {
       isChatWindow: false,
       displayName: "",
@@ -154,6 +158,7 @@ fetchList = async (props, onData) => {
 
     var chatProps = {
       appUsers: [],
+      appUsersOffline: [],
       feathersApp: feathersApp,
       uniqueKey: "bhavish1",
       appId: "594261f8b91d61efdf26d1db",
@@ -172,24 +177,24 @@ fetchList = async (props, onData) => {
         onData(null, chatProps);
       })
       .catch(err => console.log("Create", err));
-  }
 
-  feathersApp.service("app-chat-room-messages").on("created", msg => {
-    if (msg.chatRoomId === chatProps.chatRoomId) {
-      const messageObj = {};
-      messageObj._id = msg._id; // currentID
-      messageObj.text = msg.content;
-      messageObj.createdAt = msg.createdAt;
-      messageObj.user = {
-        _id: msg.createdByAppUserId
-      };
-      chatProps.appChatRoomMessages = _.concat(
-        messageObj,
-        chatProps.appChatRoomMessages
-      );
-      onData(null, chatProps);
-    }
-  });
+    feathersApp.service("app-chat-room-messages").on("created", msg => {
+      if (msg.chatRoomId === chatProps.chatRoomId) {
+        const messageObj = {};
+        messageObj._id = msg._id; // currentID
+        messageObj.text = msg.content;
+        messageObj.createdAt = msg.createdAt;
+        messageObj.user = {
+          _id: msg.createdByAppUserId
+        };
+        chatProps.appChatRoomMessages = _.concat(
+          messageObj,
+          chatProps.appChatRoomMessages
+        );
+        onData(null, chatProps);
+      }
+    });
+  }
 };
 
 export default compose(fetchList, composerOptions)(GeekChat);
