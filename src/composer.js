@@ -10,7 +10,7 @@ import socketio from "feathers-socketio/client";
 import authentication from "feathers-authentication-client";
 import { compose } from "react-komposer";
 
-const API_URL = "http://localhost:3030";
+const API_URL = "http://localhost:3030?token=testing";
 
 const data = {
   appId: "594261f8b91d61efdf26d1db",
@@ -28,6 +28,7 @@ const authData = {
 const options = {
   transports: ["websocket"],
   pingTimeout: 3000,
+  params: "bhavish",
   pingInterval: 5000
 };
 
@@ -151,7 +152,7 @@ fetchList = async (props, onData) => {
       }
     };
 
-    const chatProps = {
+    var chatProps = {
       appUsers: [],
       feathersApp: feathersApp,
       uniqueKey: "bhavish1",
@@ -174,8 +175,6 @@ fetchList = async (props, onData) => {
   }
 
   feathersApp.service("app-chat-room-messages").on("created", msg => {
-    console.log(this);
-    console.log(fetchList);
     if (msg.chatRoomId === chatProps.chatRoomId) {
       const messageObj = {};
       messageObj._id = msg._id; // currentID
@@ -184,10 +183,12 @@ fetchList = async (props, onData) => {
       messageObj.user = {
         _id: msg.createdByAppUserId
       };
-      chatProps.appChatRoomMessages.unshift(messageObj);
+      chatProps.appChatRoomMessages = _.concat(
+        messageObj,
+        chatProps.appChatRoomMessages
+      );
       onData(null, chatProps);
     }
-    console.log("Listener", msg);
   });
 };
 
