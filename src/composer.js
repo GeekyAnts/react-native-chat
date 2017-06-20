@@ -22,7 +22,7 @@ const data = {
 const authData = {
   strategy: "local",
   appId: "594261f8b91d61efdf26d1db",
-  uniqueKey: "panda"
+  uniqueKey: "captain"
 };
 
 const options = {
@@ -62,9 +62,9 @@ const composerOptions = {
 fetchList = async (props, onData) => {
   const authenticate = await feathersApp.authenticate(authData);
   if (authenticate) {
-    feathersApp.on("login", data => {
-      console.log(data);
-    });
+    // feathersApp.on("login", data => {
+    //   console.log(data);
+    // });
     let state = {
       isChatWindow: false,
       displayName: "",
@@ -192,6 +192,18 @@ fetchList = async (props, onData) => {
           chatProps.appChatRoomMessages
         );
         onData(null, chatProps);
+      }
+    });
+
+    feathersApp.service("app-users").on("patched", user => {
+      if (chatProps.appUsers.length > 0) {
+        let updatedUsers = [];
+        updatedUsers = _.extend();
+        console.log(updatedUsers);
+        // chatProps.appUsers = _.concat(chatProps.appUsers, updatedUsers);
+        // console.log(user);
+        // console.log("Users", chatProps.appUsers);
+        // onData(null, chatProps);
       }
     });
   }
