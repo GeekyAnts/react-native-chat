@@ -58,7 +58,7 @@ export default (UserList = props => {
       <SectionList
         renderSectionHeader={({ section }) => this.sectionComponent(section)}
         sections={[
-          { data: props.appUsers, key: "Online" },
+          { data: props.appUsersOnline, key: "Online" },
           { data: props.appUsersOffline, key: "Offline" }
         ]}
         style={{ flex: 1 }}

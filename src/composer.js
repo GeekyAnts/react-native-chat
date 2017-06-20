@@ -13,16 +13,16 @@ import { compose } from "react-komposer";
 const API_URL = "http://10.0.1.38:3030?token=testing";
 
 const data = {
-  appId: "594261f8b91d61efdf26d1db",
-  uniqueKey: "sparrow",
+  appId: "59491db9407a3a2dbe7d8168",
+  uniqueKey: "panda",
   status: false,
-  displayName: "Sparrow"
+  displayName: "Panda"
 };
 
 const authData = {
   strategy: "local",
-  appId: "594261f8b91d61efdf26d1db",
-  uniqueKey: "captain"
+  password: "59491db9407a3a2dbe7d8168",
+  uniqueKey: "panda"
 };
 
 const options = {
@@ -61,16 +61,13 @@ const composerOptions = {
 
 fetchList = async (props, onData) => {
   const authenticate = await feathersApp.authenticate(authData);
-  if (authenticate) {
-    // feathersApp.on("login", data => {
-    //   console.log(data);
-    // });
+  if (authentication) {
     let state = {
       isChatWindow: false,
       displayName: "",
-      appId: "594261f8b91d61efdf26d1db",
+      appId: "594911997ba11e23a0271644",
       selectedUserId: "",
-      currentUserId: "bhavish1",
+      currentUserId: "59491de3407a3a2dbe7d8169",
       uniqueRoomName: "",
       reverseUniqueName: ""
     };
@@ -120,13 +117,13 @@ fetchList = async (props, onData) => {
       let findRoomId = await feathersApp.service("app-chat-rooms").find(query);
 
       if (findRoomId.total === 0) {
+        chatRoomId = state.reverseUniqueName;
         const reverseQuery = {
           query: {
             roomName: state.reverseUniqueName
           }
         };
 
-        chatRoomId = state.reverseUniqueName;
         let findReverseRoomId = await feathersApp
           .service("app-chat-rooms")
           .find(reverseQuery);
@@ -141,15 +138,9 @@ fetchList = async (props, onData) => {
             .service("app-chat-rooms")
             .create(chatRoom);
           chatRoomId = state.uniqueRoomName;
-          chatProps.chatWindowProps = {
-            appChatRoomMessages: [],
-            chatRoomId: chatRoomId
-          };
-          onData(null, chatProps);
+          filterMessages(chatRoomId);
         } else {
-          chatProps.appChatRoomMessages = [];
-          chatProps.chatRoomId = chatRoomId;
-          onData(null, chatProps);
+          filterMessages(chatRoomId);
         }
       } else {
         filterMessages(chatRoomId);
@@ -158,10 +149,11 @@ fetchList = async (props, onData) => {
 
     var chatProps = {
       appUsers: [],
+      appUsersOnline: [],
       appUsersOffline: [],
       feathersApp: feathersApp,
-      uniqueKey: "bhavish1",
-      appId: "594261f8b91d61efdf26d1db",
+      uniqueKey: "panda",
+      appId: "59491db9407a3a2dbe7d8168",
       appChatRoomMessages: [],
       chatRoomId: "",
       state: state,
@@ -173,7 +165,16 @@ fetchList = async (props, onData) => {
       .service("app-users")
       .find()
       .then(data => {
-        chatProps.appUsers = data.data;
+        const index = _.findIndex(data.data, { uniqueKey: authData.uniqueKey });
+        const userList = data.data;
+        userList.splice(index, 1);
+        chatProps.appUsers = userList;
+        chatProps.appUsersOnline = _.filter(chatProps.appUsers, {
+          status: true
+        });
+        chatProps.appUsersOffline = _.filter(chatProps.appUsers, {
+          status: false
+        });
         onData(null, chatProps);
       })
       .catch(err => console.log("Create", err));
@@ -197,13 +198,19 @@ fetchList = async (props, onData) => {
 
     feathersApp.service("app-users").on("patched", user => {
       if (chatProps.appUsers.length > 0) {
+        const index = _.findIndex(chatProps.appUsers, { _id: user._id });
         let updatedUsers = [];
-        updatedUsers = _.extend();
-        console.log(updatedUsers);
-        // chatProps.appUsers = _.concat(chatProps.appUsers, updatedUsers);
-        // console.log(user);
-        // console.log("Users", chatProps.appUsers);
-        // onData(null, chatProps);
+        updatedUsers = chatProps.appUsers;
+        updatedUsers[index] = user;
+        chatProps.appUsers = _.concat([], updatedUsers);
+        chatProps.appUsersOnline = _.filter(chatProps.appUsers, {
+          status: true
+        });
+        chatProps.appUsersOffline = _.filter(chatProps.appUsers, {
+          status: false
+        });
+
+        onData(null, chatProps);
       }
     });
   }

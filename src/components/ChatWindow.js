@@ -36,7 +36,7 @@ export default (ChatWindow = props => {
     const messageObj = {
       appId: props.appId,
       chatRoomId: props.chatRoomId,
-      createdByAppUserId: props.currentUserId, // Bhavish
+      createdByAppUserId: props.currentUserId,
       type: "Text",
       content: messages[0].text
     };
@@ -46,8 +46,8 @@ export default (ChatWindow = props => {
   return (
     <View style={styles.container}>
       <GiftedChat
+        keyboardShouldPersistTaps="handled"
         messages={props.appChatRoomMessages}
-        keyboardShouldPersistTaps="always"
         onSend={onSend}
         user={{
           _id: props.currentUserId

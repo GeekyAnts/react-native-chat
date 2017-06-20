@@ -76,7 +76,7 @@ export default class GeekChat extends Component {
         {this.props.appUsers.length
           ? <UserList
               appId={this.props.appId}
-              appUsers={this.props.appUsers}
+              appUsersOnline={this.props.appUsersOnline}
               appUsersOffline={this.props.appUsersOffline}
               currentUserId={this.props.state.currentUserId}
               onPress={(bool, name, selectedUserId) =>
@@ -114,7 +114,7 @@ export default class GeekChat extends Component {
           </Body>
           <Right />
         </Header>
-        <Content>
+        <Content keyboardShouldPersistTaps="always" scrollEnabled={false}>
           {this.renderWindow()}
         </Content>
       </Container>
