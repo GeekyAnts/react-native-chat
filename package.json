@@ -32,7 +32,7 @@
     "lodash": "^4.17.4",
     "native-base": "^2.1.4",
     "react": "16.0.0-alpha.6",
-    "react-komposer": "^2.0.0",
+    "react-komposer": "https://github.com/bhavishhak/react-komposer.git",
     "react-native": "^0.44.0",
     "react-native-gifted-chat": "^0.1.4",
     "socket.io": "^2.0.2",

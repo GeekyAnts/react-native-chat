@@ -56,6 +56,11 @@ const composerOptions = {
         <Spinner />
       </Content>
     </Container>
+  ),
+  errorHandler: err => (
+    <Text style={{ color: "red" }}>
+      {err.message}
+    </Text>
   )
 };
 
@@ -214,6 +219,9 @@ fetchList = async (props, onData) => {
       }
     });
   }
+  return () => {
+    clearInterval();
+  };
 };
 
 export default compose(fetchList, composerOptions)(GeekChat);
