@@ -7,7 +7,7 @@ Just install the package and start using it.
 
 #### 2. Generate an App Token from the website.
 
-#### 3. Pass that app Token  GeekChat as shown below in the example (using setToken function)
+#### 3. Pass that app Token to GeekChat as shown below in the example (using setToken function)
 
 ## Example
 You can see the example app for full reference [here](https://github.com/GeekyAnts/react-native-chat-example)
