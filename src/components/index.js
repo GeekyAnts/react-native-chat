@@ -23,7 +23,7 @@ import UserList from "./UserList";
 import ChatWindow from "./ChatWindow";
 
 export default class GeekChat extends Component {
-  static token = "";
+  static appId = "";
   static propTypes() {
     return {
       appUsers: PropTypes.arrayOf(PropsTypes.object)
@@ -33,6 +33,14 @@ export default class GeekChat extends Component {
     return {
       appUsers: []
     };
+  }
+
+  static setAppId = data => {
+    GeekChat.appId = data;
+  };
+
+  static getAppId() {
+    return GeekChat.appId;
   }
 
   renderRow = ({ item }) => {
@@ -64,7 +72,7 @@ export default class GeekChat extends Component {
           feathersApp={this.props.feathersApp}
           appChatRoomMessages={this.props.appChatRoomMessages}
           chatRoomId={this.props.chatRoomId}
-          appId={this.props.appId}
+          appId={GeekChat.appId}
           reverseName={this.props.state.reverseUniqueName}
           roomName={this.props.state.uniqueRoomName}
           currentUserId={this.props.state.currentUserId}
@@ -75,7 +83,7 @@ export default class GeekChat extends Component {
       <View style={{ flex: 1 }}>
         {this.props.appUsers.length
           ? <UserList
-              appId={this.props.appId}
+              appId={GeekChat.appId}
               appUsersOnline={this.props.appUsersOnline}
               appUsersOffline={this.props.appUsersOffline}
               currentUserId={this.props.state.currentUserId}
@@ -92,18 +100,32 @@ export default class GeekChat extends Component {
   };
 
   render() {
+    if (this.props.error) {
+      return (
+        <Container>
+          <Header />
+          <Content>
+            <Text>
+              Error: {this.props.error}
+            </Text>
+          </Content>
+        </Container>
+      );
+    }
     return (
       <Container>
         <Header>
           <Left>
-            {this.props.state.isChatWindow
-              ? <Button
-                  onPress={() => this.props.setState({ isChatWindow: false })}
-                  transparent
-                >
-                  <Icon name="arrow-back" />
-                </Button>
-              : <View />}
+            <Button
+              onPress={() => {
+                this.props.state.isChatWindow
+                  ? this.props.setState({ isChatWindow: false })
+                  : this.props.onBackPress();
+              }}
+              transparent
+            >
+              <Icon name="arrow-back" />
+            </Button>
           </Left>
           <Body>
             <Title>
@@ -114,7 +136,11 @@ export default class GeekChat extends Component {
           </Body>
           <Right />
         </Header>
-        <Content keyboardShouldPersistTaps="always" scrollEnabled={false}>
+        <Content
+          keyboardShouldPersistTaps="always"
+          scrollEnabled={false}
+          contentContainerStyle={{ flex: 1 }}
+        >
           {this.renderWindow()}
         </Content>
       </Container>

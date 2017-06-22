@@ -1,9 +1,2 @@
-import GeekChat from "./App";
-export { GeekChat };
-
-// import GeekChat, {getToken, setToken } from './App';
-// export {
-//     GeekChat,
-//     getToken,
-//     setToken
-// };
+import GeekChat, { createUser, getToken, setToken } from "./App";
+export { GeekChat, createUser, getToken, setToken };
