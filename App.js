@@ -10,7 +10,7 @@ import socketio from "feathers-socketio/client";
 import authentication from "feathers-authentication-client";
 import { compose } from "react-komposer";
 
-const API_URL = "http://10.0.1.38:3030?token=testing";
+const API_URL = "http://api.react-native-chat.com:3030?token=testing";
 
 const options = {
   transports: ["websocket"],
@@ -79,6 +79,7 @@ fetchList = async (props, onData) => {
   onBackPress = () => {
     props.onBackPress();
   };
+
   if (props.userData) {
     const authData = {
       strategy: "local",
@@ -257,6 +258,18 @@ fetchList = async (props, onData) => {
           updatedUsers = chatProps.appUsers;
           updatedUsers.push(newUser);
           chatProps.appUsers = _.concat([], updatedUsers);
+          chatProps.appUsersOnline = _.filter(chatProps.appUsers, {
+            status: true
+          });
+          chatProps.appUsersOffline = _.filter(chatProps.appUsers, {
+            status: false
+          });
+
+          onData(null, chatProps);
+        } else {
+          let singleUser = [];
+          singleUser.push(newUser);
+          chatProps.appUsers = _.concat([], singleUser);
           chatProps.appUsersOnline = _.filter(chatProps.appUsers, {
             status: true
           });

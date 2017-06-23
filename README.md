@@ -3,7 +3,7 @@ Just install the package and start using it.
 
 ### How to Install:
 
-#### 1. Headover to the nativebase.io website and create an account
+#### 1. Headover to the [react-native-chat](https://react-native-chat.com) website and follow the steps.
 
 #### 2. Generate an App Token from the website.
 
