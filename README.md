@@ -79,3 +79,6 @@ console.log(appToken);
 - **`userData`** _(bool)_ - The user data as an object which you get from the createUser function.
        Requires: `uniqueKey`, `displayName` and `_id`.
 - **`onBackPress`** _(func)_ - call your custom function when your need to exit from the chatApp.
+
+
+We have used `react-native-gifted-chat` for UI. Check it out [here](https://github.com/FaridSafi/react-native-gifted-chat)
