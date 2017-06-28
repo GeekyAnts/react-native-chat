@@ -141,7 +141,7 @@ fetchList = async (props, onData) => {
           }
         };
 
-        let findRoomId = await feathersApp.service("app-chat-rooms").find();
+        let findRoomId = await feathersApp.service("app-chat-rooms").find(query);
 
         if (findRoomId.total === 0) {
           chatRoomId = state.reverseUniqueName;
